@@ -1,22 +1,27 @@
 ---
-title: "Modify the default capacity provider strategy (CPS)"
-weight: 25
+title: "Setup default capacity provider strategy"
+weight: 60
 ---
 
-To modify the CP, follow these steps:
+Once that we have defined the ECS Cluster Capacity Providers, we can setup a default strategy. New services and tasks launched to this cluster will use this strategy by default. You can create however specific strategies different from the default for each service.
 
-* Click on the tab *Capacity Providers*
-* Click on the *Update Cluster* on the top right
-* For Capacity provider name, enter *CP-SPOT*
-* Click on *Add another provider*
-* Click on *Add another provider* one more time
-* For  Provider 1, select *CP-OD*, set base value to *2* and leave weight to default value of *1*
-* For  Provider 2, select *CP-SPOT*, leave base to default value of *0* and set weight to *3*
-* Click on *Update* on bottom right
+For our default capacity provider we have considered the following application requirements:
+
+* There should be at least 2 tasks running on On-Demand instances to serve the normal traffic. The **base=2** configuration satisfies this requirement.
+* Tasks deployed to On-Demand and Spot Instances, follow a 1:3 ratio to handle any additional traffic
+
+With this requirements we can set **EcsSpotWorkshopUpdate** cluster default capacity provider strategy, follow these steps:
+
+* Go to the ECS Cluster console and select the **EcsSpotWorkshopUpdate** ECS Cluster.
+* Click on the **Update Cluster** option on the top right, and click **Add Another Provider**
+* For Provider 1: select **CP-OD**, set base value to **2** and weight to **1**
+* Click on **Add another provider** one more time
+* For Provider 2: select **CP-SPOT**, leave base to default value of **0** and set weight to **3**
+* Click on **Update** on bottom right
 
 
 ![Capacity Provider Strategy](/images/ecs-spot-capacity-providers/CPS.png)
 
-Also note the default capacity provider strategy used in the above command. It sets base=2 and weight=1 for On-demand ASG CP and weight of 3 for CP-SPOT.  That means, ECS will first place 2 tasks (since base=2) on CP-OD and splits the remaining tasks between CP-OD and CP-SOT in 1:3 ratio, which means for every 1 task on CP-OD, 3 will be placed on CP-SPOT.
-
-You can override this default CPS and specify a different custom strategy for each service independently. 
+{{% notice note %}}
+Checkout the strategy configuration; it sets **`base=2`** and **`weight=1`** for CP-OD and **`weight=3`** for CP-SPOT. That means, ECS first places 2 tasks (since base=2) to CP-OD and then splits the remaining tasks between CP-OD and CP-SOT in 1:3 ratio, so for every 1 task on CP-OD, 3 tasks placed on CP-SPOT.
+{{% /notice %}}
